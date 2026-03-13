@@ -1,13 +1,24 @@
 cmake_minimum_required(VERSION 3.10)
-project(HelloWorld)
+project(polymarket LANGUAGES CXX)
+
+set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_BUILD_TYPE Debug)
 
 find_package(fmt CONFIG REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system) 
 find_package(OpenSSL REQUIRED)
 
-add_executable(HelloWorld helloworld.cpp)
+set(SOURCES
+    src/main.cpp
+    src/Logger.cpp
+)
 
-target_link_libraries(HelloWorld PRIVATE 
+add_executable(polymarket ${SOURCES})
+
+target_include_directories(polymarket PRIVATE include)
+
+target_link_libraries(polymarket PRIVATE 
     fmt::fmt
     Boost::boost
     OpenSSL::SSL
