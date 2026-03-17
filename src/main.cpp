@@ -1,13 +1,10 @@
-#include <iostream>
-#include <boost/asio.hpp>
-#include "Logger.hpp"
+#include "Connection.hpp"
 
-int main()
+auto main() -> int
 {
-    std::queue<std::string> q;
-    Logger logger("log", q);
+    auto ctx = std::make_shared<boost::asio::io_context>();
+    Connection foo("ws://...", ctx, false);
 
-    logger.log("GHello");
-    logger.log("Foooo");
-    logger.write();
+    
+    std::print("Hello world");
 }

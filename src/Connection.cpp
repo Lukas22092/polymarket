@@ -1,0 +1,54 @@
+//wss://stream.binance.com:9443/ws/btcusdt@trade
+#include "Connection.hpp"
+
+Connection::Connection(
+    const std::string& url, 
+    std::shared_ptr<net::io_context> ioc_,
+    const bool has_subscription)
+    : 
+    url_(url),
+    ioc_(ioc_),
+    has_subscription_(has_subscription),
+    ctx_({ssl::context::tlsv12_client}),
+    resolver_{*ioc_}, 
+    ws_{*ioc_, ctx_}
+    {
+        /*set in constructor for RAII*/
+        //ordering of members should not leak if a exception in thrown
+        ctx_.set_verify_mode(ssl::verify_peer);
+        ctx_.set_default_verify_paths();
+    }
+
+auto Connection::connect(std::string& host, const char* port) -> void
+{
+    const auto& results = resolver_.resolve(host, port);
+    const auto& ep = net::connect(beast::get_lowest_layer(ws_), results);
+    if(!SSL_set_tlsext_host_name(ws_.next_layer().native_handle(), host.c_str()))
+    {
+        throw beast::system_error(
+            static_cast<int>(::ERR_get_error()),
+            net::error::get_ssl_category());
+    }
+    ws_.next_layer().set_verify_callback(ssl::host_name_verification(host));
+    host += ':' + std::to_string(ep.port());
+    ws_.next_layer().handshake(ssl::stream_base::client);
+    ws_.handshake(host, "/ws/market");
+}
+
+auto Connection::receive() -> void
+{
+    ws_.read(buffer_);
+    std::cout << beast::make_printable(buffer_.data()) << "\n";;
+}; 
+Connection::~Connection()
+{
+    try
+    {
+        ws_.close(websocket::close_code::normal);
+    }
+    catch(...)
+    {
+        
+    }
+}
+

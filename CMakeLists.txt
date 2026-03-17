@@ -12,6 +12,7 @@ find_package(OpenSSL REQUIRED)
 set(SOURCES
     src/main.cpp
     src/Logger.cpp
+    src/Connection.cpp
 )
 
 add_executable(polymarket ${SOURCES})

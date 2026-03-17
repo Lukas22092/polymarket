@@ -13,5 +13,4 @@ void Logger::write()
     this->stream.open("log");
     this->stream << "writing logging data\n";
     this->stream.close();
-
 }
