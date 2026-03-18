@@ -7,6 +7,7 @@
 #include <print>
 #include <iostream>
 #include <memory>
+#include <ranges>
 namespace beast = boost::beast;         // from <boost/beast.hpp>
 namespace http = beast::http;           // from <boost/beast/http.hpp>
 namespace websocket = beast::websocket; // from <boost/beast/websocket.hpp>
@@ -17,7 +18,6 @@ using tcp = boost::asio::ip::tcp;       // from <boost/asio/ip/tcp.hpp>
 class Connection
 {
     private:
-    const std::string url_;
     std::shared_ptr<net::io_context> ioc_;    
     bool has_subscription_;
     ssl::context ctx_; //
@@ -27,7 +27,7 @@ class Connection
 
 
     public:
-    explicit Connection(const std::string& url, std::shared_ptr<net::io_context> ioc_, const bool has_subscription);
+    explicit Connection(std::shared_ptr<net::io_context> ioc_, const bool has_subscription);
     auto connect(std::string& host, const char* port) -> void;
     auto receive() -> void;
 
