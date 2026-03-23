@@ -12,6 +12,7 @@ auto main() -> int
         connection->connect(url, "9443"); 
         
     } 
+    std::cout << "foo\n";
 
     return 0;
 }
