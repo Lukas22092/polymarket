@@ -43,15 +43,15 @@ auto Connection::connect(std::string& host, const char* port) -> void
             }));
     ws_.next_layer().handshake(ssl::stream_base::client);
     ws_.handshake(new_host, "/ws/btcusdt@trade");
-    while(true)
-        receive();
+    
+    receive();
 }
 
 auto Connection::receive() -> void
 {
     ws_.read(buffer_);
-    std::cout << buffer_.size() << std::endl;
-    //std::cout << beast::make_printable(buffer_.data()) << "\n";;
+    //std::cout << buffer_.size() << std::endl;
+    std::cout << beast::make_printable(buffer_.data()) << "\n";;
 }; 
 Connection::~Connection()
 {
