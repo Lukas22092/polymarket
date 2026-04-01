@@ -1,18 +1,9 @@
 #include "Connection.hpp"
-
+#include "Logger.hpp"
 auto main() -> int
 {
-    auto ctx = std::make_shared<boost::asio::io_context>();
+    LOG_ENTRY;
 
-    {
-        std::unique_ptr<Connection> connection = std::make_unique<Connection>(ctx, false);
-
-        std::string url = "wss://stream.binance.com";
-        
-        connection->connect(url, "9443"); 
-        
-    } 
-    std::cout << "foo\n";
 
     return 0;
 }
