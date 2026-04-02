@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 project(polymarket LANGUAGES CXX)
+set_property(TARGET polymarket PROPERTY COMPILE_WARNING_AS_ERROR ON)
+
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

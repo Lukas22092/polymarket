@@ -16,8 +16,5 @@ Logger::~Logger()
     }
 }
 
-void Logger::write(const std::string& msg)
-{
-    stream_ << msg;
-}
+
 

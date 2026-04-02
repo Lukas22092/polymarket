@@ -1,10 +1,12 @@
 #pragma once
 
+#include <chrono>
 #include <string>
 #include <iostream>
 #include <thread>
 #include <queue>
 #include <fstream>
+#include <cstdlib>
 #include "EnumTools.hpp"
 
 
@@ -24,11 +26,45 @@ class Logger {
     }
     std::ofstream& getStream();
 
-    void write(const std::string& msg);
+    
+
 
     ~Logger();
 
-
 };
-#define LOG_ENTRY Logger::getInstance().write("[" + std::string(__FUNCTION__) + ":" + std::to_string(__LINE__) + "] ")
-#define LOG_THIS(LOG_MODE, log_message) std::cout << "[" << EnumTools::EnumToString(LOG_MODE) << "]"<< " " << log_message << "\n"
+
+/*
+* not threadsafe yet. will come soon ig. move this to logger cpp....
+*/
+struct ScopeLogger {
+    const char* func_name;
+    const std::chrono::time_point<std::chrono::high_resolution_clock> t1;
+    static inline int indent_level = 0;
+    static int& getIndentLevel() {
+            return indent_level;
+        }
+    ScopeLogger(const char* name) 
+    :
+    func_name{name},
+    t1{std::chrono::high_resolution_clock::now()}
+    {
+        indent_level++;
+        Logger::getInstance().getStream() 
+            << std::string(indent_level * 2, ' ') << ">>" << "[" << EnumToString(LogLevel::Trace) << "] " << func_name << "\n";
+    }
+
+    ~ScopeLogger() 
+    {
+        const auto& t2 = std::chrono::high_resolution_clock::now();
+        const auto& duration = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1);
+        Logger::getInstance().getStream() 
+           << std::string(indent_level * 2, ' ') << "<<" "[" << EnumToString(LogLevel::Trace) << "]" << "[" << duration << "] " << "~" << func_name <<  "\n";
+        indent_level--;
+
+    }
+};
+
+#define LOG_ENTRY ScopeLogger _scope_logger(__FUNCTION__)
+#define LOG_THIS(LogLevel) Logger::getInstance().getStream() << "[" << EnumToString(LogLevel) << "] " << std::string((ScopeLogger::getIndentLevel()) * 2, ' ')
+
+

@@ -7,21 +7,23 @@ inline auto EnumToString(E enum_) -> std::string
     return "UNKNOWN ENUM";
 };
 
-enum log_level
+enum LogLevel
 {
     Trace,
     Debug,
     Error,
+    Duration,
 };
 
 template<>
-inline auto EnumToString(log_level enum_) -> std::string
+inline auto EnumToString(LogLevel enum_) -> std::string
 {
     switch(enum_)
     {
         case Trace : return "Trace";
         case Debug : return "Debug";
         case Error : return "Error";
+        case Duration: return "Duration";
         default: return "UNKNOWN ENUM";
     }
 }
