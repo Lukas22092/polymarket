@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
 project(polymarket LANGUAGES CXX)
-set_property(TARGET polymarket PROPERTY COMPILE_WARNING_AS_ERROR ON)
 
 
 set(CMAKE_CXX_STANDARD 23)
@@ -20,6 +19,7 @@ set(SOURCES
 add_executable(polymarket ${SOURCES})
 
 target_include_directories(polymarket PRIVATE include)
+set_property(TARGET polymarket PROPERTY COMPILE_WARNING_AS_ERROR ON)
 
 target_link_libraries(polymarket PRIVATE 
     fmt::fmt

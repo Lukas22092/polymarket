@@ -12,7 +12,7 @@ enum LogLevel
     Trace,
     Debug,
     Error,
-    Duration,
+    Warn,
 };
 
 template<>
@@ -23,7 +23,7 @@ inline auto EnumToString(LogLevel enum_) -> std::string
         case Trace : return "Trace";
         case Debug : return "Debug";
         case Error : return "Error";
-        case Duration: return "Duration";
+        case Warn: return "Warn";
         default: return "UNKNOWN ENUM";
     }
 }

@@ -31,7 +31,7 @@ class Connection
     explicit Connection(std::shared_ptr<net::io_context> ioc_, const bool has_subscription);
     auto connect(std::string& host, const char* port) -> void;
     auto receive() -> void;
-
+    [[nodiscard]] auto get_item()-> bool;
 
 
     ~Connection();

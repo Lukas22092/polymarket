@@ -1,41 +1,24 @@
 #include "Connection.hpp"
 #include "Logger.hpp"
 
-#include <thread>
-#include <chrono>
 
-auto deep_nested(int depth) -> void {
+auto main() -> int
+{
     LOG_ENTRY;
-    if (depth > 0) {
-        LOG_THIS(LogLevel::Debug) << "depth: " << depth << "\n";
-        deep_nested(depth - 1);
-    } else {
-        LOG_THIS(LogLevel::Debug) << "Reached the bottom!\n";
-    }
-}
+    std::cout << "starting\n";
+    auto ctx = std::make_shared<boost::asio::io_context>();
 
-auto fast_function() -> void {
-    LOG_ENTRY;
-    LOG_THIS(LogLevel::Debug) << "I am fast.\n";
-}
-
-auto slow_function() -> void {
-    LOG_ENTRY;
-    LOG_THIS(LogLevel::Debug) << "Doing some heavy work....\n";
-    std::this_thread::sleep_for(std::chrono::milliseconds(500));
-    LOG_THIS(LogLevel::Debug) << "done.\n";
-}
-
-auto main() -> int {
-    // 1. Einfacher Start
-    LOG_THIS(LogLevel::Debug) << "Starting the trace test...\n";
-
-    deep_nested(3);
-
-    fast_function();
-    slow_function();
-
-    LOG_THIS(LogLevel::Debug) << "Trace test finished.\n";
     
+    std::unique_ptr<Connection> connection = std::make_unique<Connection>(ctx, false);
+    std::string url = "wss://stream.binance.com";
+    
+    connection->connect(url, "9443");
+    
+    auto foo = connection->get_item();
+    std::cout << "foo\n";
+
+    int a = 23;
+    
+
     return 0;
 }

@@ -50,7 +50,7 @@ struct ScopeLogger {
     {
         indent_level++;
         Logger::getInstance().getStream() 
-            << std::string(indent_level * 2, ' ') << ">>" << "[" << EnumToString(LogLevel::Trace) << "] " << func_name << "\n";
+            << std::string(indent_level * 2, ' ') << ">>" << "[" << EnumToString(LogLevel::Trace) << "] " << func_name << std::endl;
     }
 
     ~ScopeLogger() 
@@ -58,13 +58,13 @@ struct ScopeLogger {
         const auto& t2 = std::chrono::high_resolution_clock::now();
         const auto& duration = std::chrono::duration_cast<std::chrono::microseconds>(t2 - t1);
         Logger::getInstance().getStream() 
-           << std::string(indent_level * 2, ' ') << "<<" "[" << EnumToString(LogLevel::Trace) << "]" << "[" << duration << "] " << "~" << func_name <<  "\n";
+           << std::string(indent_level * 2, ' ') << "<<" "[" << EnumToString(LogLevel::Trace) << "]"  << "~" << func_name << "[" << duration << "] " << std::endl;
         indent_level--;
 
     }
 };
 
 #define LOG_ENTRY ScopeLogger _scope_logger(__FUNCTION__)
-#define LOG_THIS(LogLevel) Logger::getInstance().getStream() << "[" << EnumToString(LogLevel) << "] " << std::string((ScopeLogger::getIndentLevel()) * 2, ' ')
+#define LOG_THIS(LogLevel) Logger::getInstance().getStream() << "[" << EnumToString(LogLevel) << "] "<< __FUNCTION__  << std::string((ScopeLogger::getIndentLevel()) * 2, ' ') << std::endl
 
 

@@ -1,6 +1,7 @@
 //wss://stream.binance.com:9443/ws/btcusdt@trade
 //wss://echo.websocket.org
 #include "Connection.hpp"
+#include "Logger.hpp"
 
 Connection::Connection(
     std::shared_ptr<net::io_context> ioc_,
@@ -20,6 +21,7 @@ Connection::Connection(
 
 auto Connection::connect(std::string& host, const char* port) -> void
 {
+    LOG_ENTRY;
     auto new_host = host.substr(host.find_last_of('/') + 1);
 
 
@@ -44,25 +46,36 @@ auto Connection::connect(std::string& host, const char* port) -> void
     ws_.next_layer().handshake(ssl::stream_base::client);
     ws_.handshake(new_host, "/ws/btcusdt@trade");
     
+    
     receive();
 }
 
 auto Connection::receive() -> void
 {
-    ws_.read(buffer_);
-    //std::cout << buffer_.size() << std::endl;
-    std::cout << beast::make_printable(buffer_.data()) << "\n";;
+    LOG_ENTRY;
+    while(true)
+        {
+        ws_.read(buffer_);
+        LOG_THIS(LogLevel::Trace) << beast::make_printable(buffer_.data()) << std::endl;
+        buffer_.consume(buffer_.size());
+        }
 }; 
+
+
+[[nodiscard]] auto Connection::get_item()-> bool
+{
+    LOG_ENTRY;
+    LOG_THIS(LogLevel::Trace)<< boost::beast::make_printable(buffer_.data()) << "\n";
+    return true;
+}
+
+
 Connection::~Connection()
 {
-    try
-    {       
-        ws_.close(websocket::close_code::normal);
-    }
-    catch(...)
-    {
-        std::cout << "closing error occured" << "\n";
+        beast::error_code ec;
+        ws_.close(websocket::close_code::normal, ec);
         
-    }
+        if(ec)
+            LOG_THIS(LogLevel::Warn) << "Error during closing connection :" << ec.what();
 }
 
