@@ -1,5 +1,5 @@
 #!/bin/bash
-
+cmake -S . -B build
 cmake --build build
 
 if [ $? -eq 0 ]; then

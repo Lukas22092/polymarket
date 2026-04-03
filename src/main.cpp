@@ -13,6 +13,7 @@ auto main() -> int
     std::string url = "wss://stream.binance.com";
     
     connection->connect(url, "9443");
+   
     
     auto foo = connection->get_item();
     std::cout << "foo\n";
