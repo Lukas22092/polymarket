@@ -1,25 +1,29 @@
 #include "Connection.hpp"
-#include "Logger.hpp"
+#include <thread>
 
-
-auto main() -> int
-{
-    LOG_ENTRY;
-    std::cout << "starting\n";
+auto main() -> int {
     auto ctx = std::make_shared<boost::asio::io_context>();
+    Connection conn(ctx, false);
+    std::string url = "stream.binance.com";
+    
+    conn.connect(url, "9443"); 
+    
+    std::thread worker([&conn]() {
+        conn.receive(); 
+    });
+
+    std::thread consumer([&conn]() {
+        auto foo = conn.get_item(); 
+        if(!foo.is_null()) {
+            int64_t trade_id = foo.at("t").as_int64();
+            std::cout << "timestamp: " << trade_id << "\n";
+    }
+    });
+
 
     
-    std::unique_ptr<Connection> connection = std::make_unique<Connection>(ctx, false);
-    std::string url = "wss://stream.binance.com";
-    
-    connection->connect(url, "9443");
-   
-    
-    auto foo = connection->get_item();
-    std::cout << "foo\n";
 
-    int a = 23;
-    
+        
 
     return 0;
 }

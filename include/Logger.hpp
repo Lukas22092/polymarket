@@ -7,6 +7,7 @@
 #include <queue>
 #include <fstream>
 #include <cstdlib>
+#include <thread>
 #include "EnumTools.hpp"
 
 
@@ -16,7 +17,11 @@ class Logger {
     const std::string file_name_;
     std::ofstream stream_;
     std::thread logger_thread_;
+
     explicit Logger(const std::string &file_name);
+
+
+
 
     public:
     static Logger& getInstance()

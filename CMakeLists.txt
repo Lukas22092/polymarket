@@ -6,9 +6,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_BUILD_TYPE Debug)
 
 # Dependencies
-find_package(fmt CONFIG REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system) 
 find_package(OpenSSL REQUIRED)
+find_package(Boost REQUIRED COMPONENTS system json)
 
 # GTest Setup
 include(FetchContent)
@@ -29,7 +29,8 @@ set(SOURCES
     src/main.cpp
     src/Logger.cpp
     src/Connection.cpp
-    src/EventHandler.cpp  # Added this missing file
+    src/EventHandler.cpp  
+    src/parsing.cpp
 )
 
 add_executable(polymarket ${SOURCES})
@@ -37,7 +38,8 @@ target_include_directories(polymarket PRIVATE include)
 set_property(TARGET polymarket PROPERTY COMPILE_WARNING_AS_ERROR ON)
 
 target_link_libraries(polymarket PRIVATE 
-    Boost::boost
+    Boost::system
+    Boost::json
     OpenSSL::SSL
     OpenSSL::Crypto
 )
@@ -48,7 +50,7 @@ include(GoogleTest)
 
 add_executable(
   hello_test
-  tests/hello_test.cpp  # Updated path to match your folder structure
+  tests/hello_test.cpp 
 )
 
 target_link_libraries(
@@ -56,7 +58,6 @@ target_link_libraries(
   GTest::gtest_main
 )
 
-# If your tests need to include files from 'include/', add this:
 target_include_directories(hello_test PRIVATE include)
 
 gtest_discover_tests(hello_test)

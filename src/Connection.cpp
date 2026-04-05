@@ -2,6 +2,7 @@
 //wss://echo.websocket.org
 #include "Connection.hpp"
 #include "Logger.hpp"
+#include "parsing.hpp"
 
 Connection::Connection(
     std::shared_ptr<net::io_context> ioc_,
@@ -11,7 +12,9 @@ Connection::Connection(
     has_subscription_(has_subscription),
     ctx_({ssl::context::tlsv12_client}),
     resolver_{*ioc_}, 
-    ws_{*ioc_, ctx_}
+    ws_{*ioc_, ctx_},
+    m_{},
+    cv_{}
     {
         /*set in constructor for RAII*/
         //ordering of members should not leak if a exception in thrown
@@ -46,36 +49,42 @@ auto Connection::connect(std::string& host, const char* port) -> void
     ws_.next_layer().handshake(ssl::stream_base::client);
     ws_.handshake(new_host, "/ws/btcusdt@trade");
     
-    
-    receive();
-}
+    }
 
 auto Connection::receive() -> void
 {
-    LOG_ENTRY;
-    while(true)
-        {
+    while (true)
+    {
+        std::unique_lock<std::mutex> lock(m_);
+        LOG_ENTRY;
         ws_.read(buffer_);
-        LOG_THIS(LogLevel::Trace) << beast::make_printable(buffer_.data()) << std::endl;
-        buffer_.consume(buffer_.size());
-        }
+        cv_.notify_one();
+    }
 }; 
 
 
-[[nodiscard]] auto Connection::get_item()-> bool
+[[nodiscard]] auto Connection::get_item() -> boost::json::value 
 {
+    std::unique_lock<std::mutex> lock(m_);
+    cv_.wait(lock, [this]{ return !(buffer_.size() == 0);});
+    std::string_view sv{static_cast<char const*>(buffer_.data().data()), buffer_.size()};
     LOG_ENTRY;
-    LOG_THIS(LogLevel::Trace)<< boost::beast::make_printable(buffer_.data()) << "\n";
-    return true;
+
+    auto jv = Parser::parse(sv);
+    
+    buffer_.consume(buffer_.size());
+    
+    return jv;
 }
 
 
 Connection::~Connection()
 {
+        LOG_ENTRY;
         beast::error_code ec;
         ws_.close(websocket::close_code::normal, ec);
         
         if(ec)
-            LOG_THIS(LogLevel::Warn) << "Error during closing connection :" << ec.what();
+            LOG_THIS(LogLevel::Warn) << "Error during closing connection :" << ec.what() << std::endl;
 }
 

@@ -9,13 +9,15 @@
 #include <iostream>
 #include <memory>
 #include <ranges>
+#include <condition_variable>
+
+#include "parsing.hpp"
 namespace beast = boost::beast;         // from <boost/beast.hpp>
 namespace http = beast::http;           // from <boost/beast/http.hpp>
 namespace websocket = beast::websocket; // from <boost/beast/websocket.hpp>
 namespace net = boost::asio;            // from <boost/asio.hpp>
 namespace ssl = boost::asio::ssl;       // from <boost/asio/ssl.hpp>
 using tcp = boost::asio::ip::tcp;       // from <boost/asio/ip/tcp.hpp>
-
 class Connection
 {
     private:
@@ -25,13 +27,15 @@ class Connection
     tcp::resolver resolver_;
     websocket::stream<ssl::stream<tcp::socket>> ws_;
     beast::flat_buffer buffer_;
+    std::mutex m_;
+    std::condition_variable cv_;
 
 
     public:
     explicit Connection(std::shared_ptr<net::io_context> ioc_, const bool has_subscription);
     auto connect(std::string& host, const char* port) -> void;
     auto receive() -> void;
-    [[nodiscard]] auto get_item()-> bool;
+    [[nodiscard]] auto get_item()-> json::value;
 
 
     ~Connection();
