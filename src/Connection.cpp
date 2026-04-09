@@ -10,7 +10,7 @@ Connection::Connection(
     : 
     ioc_(ioc_),
     has_subscription_(has_subscription),
-    ctx_({ssl::context::tlsv12_client}),
+    ctx_(ssl::context::tlsv12_client),
     resolver_{*ioc_}, 
     ws_{*ioc_, ctx_},
     m_{},
